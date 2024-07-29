@@ -12,6 +12,7 @@ import {
   Typography,
   Paper,
 } from "@mui/material";
+import { SelectChangeEvent } from "@mui/material/Select";
 import {
   AccessRequest,
   AccessResponse,
@@ -63,13 +64,11 @@ export default function Home() {
     fetchZones();
   }, []);
 
-  const handleLayerChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleLayerChange = (event: SelectChangeEvent<string>) => {
     setLayer(event.target.value as string);
   };
 
-  const handleZoneChange = async (
-    event: React.ChangeEvent<{ value: unknown }>
-  ) => {
+  const handleZoneChange = async (event: SelectChangeEvent<string>) => {
     const selectedZone = event.target.value as string;
     setZone(event.target.value as string);
 
@@ -89,13 +88,11 @@ export default function Home() {
     }
   };
 
-  const handleTargetChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleTargetChange = (event: SelectChangeEvent<string>) => {
     setTarget(event.target.value as string);
   };
 
-  const handleSmallDroneChange = (
-    event: React.ChangeEvent<{ value: unknown }>
-  ) => {
+  const handleSmallDroneChange = (event: SelectChangeEvent<any>) => {
     setSmallDrone(drones[event.target.value as number]);
   };
 
@@ -172,7 +169,7 @@ export default function Home() {
               <InputLabel id="drone-label">Select Small Drone</InputLabel>
               <Select
                 labelId="drone-label"
-                value={drones[0]}
+                value={smallDrone}
                 onChange={handleSmallDroneChange}
                 label="Select Small Drone"
               >
