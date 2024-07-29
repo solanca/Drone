@@ -157,8 +157,10 @@ export default function Home() {
               onChange={handleZoneChange}
               label="Zone"
             >
-              {zones.map((zone) => (
-                <MenuItem value={zone}>Zone {zone}</MenuItem>
+              {zones.map((zone, index) => (
+                <MenuItem value={zone} key={index}>
+                  Zone {zone}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>
@@ -175,7 +177,9 @@ export default function Home() {
               >
                 {drones.map((drone: Drone, index) =>
                   drone.model_type === "Small" ? (
-                    <MenuItem value={index}>{drone.ID}</MenuItem>
+                    <MenuItem value={index} key={index}>
+                      {drone.ID}
+                    </MenuItem>
                   ) : null
                 )}
               </Select>
@@ -204,8 +208,10 @@ export default function Home() {
                       onChange={handleTargetChange}
                       label="Select Target"
                     >
-                      {targets.map((target) => (
-                        <MenuItem value={target}>Area {target}</MenuItem>
+                      {targets.map((target, index) => (
+                        <MenuItem value={target} key={index}>
+                          Area {target}
+                        </MenuItem>
                       ))}
                     </Select>
                   </FormControl>
@@ -237,9 +243,11 @@ export default function Home() {
                 // onChange={handleDroneChange}
                 label="Select Terminal Drone"
               >
-                {drones.map((drone: Drone) =>
+                {drones.map((drone: Drone, index) =>
                   drone.model_type === "Terminal" ? (
-                    <MenuItem value={drone.ID}>{drone.ID}</MenuItem>
+                    <MenuItem value={drone.ID} key={index}>
+                      {drone.ID}
+                    </MenuItem>
                   ) : null
                 )}
               </Select>
