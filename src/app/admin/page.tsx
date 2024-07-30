@@ -9,47 +9,57 @@ import {
   Box,
   Container,
   Link,
+  Typography,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import Drones from "./components/Drones";
 import Attributes from "./components/Attributes";
 import Policies from "./components/Policies";
 
 const AdminPage: React.FC = () => {
-  const [selectedKey, setSelectedKey] = useState<string>("dashboard");
+  const [selectedTab, setSelectedTab] = useState<number>(0);
 
-  console.log(selectedKey);
+  console.log(selectedTab);
 
   const renderContent = () => {
-    switch (selectedKey) {
-      case "drones":
-        return <Drones />;
-      case "attributes":
+    switch (selectedTab) {
+      case 0:
         return <Attributes />;
-      case "policies":
+      case 1:
+        return <Drones />;
+      case 2:
         return <Policies />;
       default:
         return <Attributes />;
     }
   };
-
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setSelectedTab(newValue);
+  };
   return (
-    <Box display="flex">
-      <Drawer variant="permanent">
-        <List className="p-4">
-          {["Attributes", "Drones", "Policies"].map((text, index) => (
-            <ListItem
-              button
-              key={text}
-              onClick={() =>
-                setSelectedKey(text.toLowerCase().replace(" ", ""))
-              }
-            >
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
-        </List>
-      </Drawer>
-      <Container className="pl-60 px-32 relative" maxWidth="lg">
+    <Box display="flex" p={5}>
+      <Box
+        sx={{
+          borderBottom: 1,
+          borderColor: "divider",
+          marginRight: "50px",
+          marginTop: "10px",
+        }}
+      >
+        <Tabs
+          value={selectedTab}
+          orientation="vertical"
+          onChange={handleTabChange}
+          aria-label="Admin Panel Tabs"
+          centered
+        >
+          <Tab label="Attributes" />
+          <Tab label="Drones" />
+          <Tab label="Policies" />
+        </Tabs>
+      </Box>
+      <Container className="relative" maxWidth="lg">
         {/* <AppBar position="static">
           <Toolbar>
             <Typography variant="h6">Admin Panel</Typography>
