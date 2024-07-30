@@ -11,6 +11,7 @@ import {
   Button,
   Typography,
   Paper,
+  Link,
 } from "@mui/material";
 import { SelectChangeEvent } from "@mui/material/Select";
 import {
@@ -20,24 +21,16 @@ import {
   fetchDronesByZone,
   sendAccessRequest,
 } from "./api";
-
-interface Drone {
-  ID: number;
-  model_type: string;
-  zone: number;
-  level: number;
-}
+import { Drone } from "./admin/types";
 
 export default function Home() {
   const [layer, setLayer] = React.useState("");
-  const [zone, setZone] = React.useState("");
+  const [zone, setZone] = React.useState<number>(NaN);
   const [drones, setDrones] = React.useState<Drone[]>([]);
   const [smallDrone, setSmallDrone] = React.useState<Drone | null>(null);
   const [terminalDrone, setTerminalDrone] = React.useState<Drone | null>(null);
-  const [target, setTarget] = React.useState("");
 
   const [zones, setZones] = React.useState<string[]>([]);
-  const [targets, setTargets] = React.useState<string[]>([]);
 
   const [accessResponse, setAccessResponse] =
     React.useState<AccessResponse | null>(null);
@@ -50,13 +43,7 @@ export default function Home() {
           (acc: string[], attr: { value: string[] }) => acc.concat(attr.value),
           []
         );
-        const targetsData = await fetchAttributesByName("Area");
-        const targetsValues = targetsData.reduce(
-          (acc: string[], attr: { value: string[] }) => acc.concat(attr.value),
-          []
-        );
         setZones(zonesValues);
-        setTargets(targetsValues);
       } catch (error) {
         console.error("Error fetching zones:", error);
       }
@@ -70,7 +57,7 @@ export default function Home() {
 
   const handleZoneChange = async (event: SelectChangeEvent<string>) => {
     const selectedZone = event.target.value as string;
-    setZone(event.target.value as string);
+    setZone(Number(event.target.value));
 
     try {
       const drones = await fetchDronesByZone(Number(selectedZone));
@@ -88,12 +75,12 @@ export default function Home() {
     }
   };
 
-  const handleTargetChange = (event: SelectChangeEvent<string>) => {
-    setTarget(event.target.value as string);
-  };
-
   const handleSmallDroneChange = (event: SelectChangeEvent<any>) => {
     setSmallDrone(drones[event.target.value as number]);
+  };
+
+  const handleTerminalDroneChange = (event: SelectChangeEvent<any>) => {
+    setTerminalDrone(drones[event.target.value as number]);
   };
 
   const handleSendRequest = async () => {
@@ -103,8 +90,8 @@ export default function Home() {
     }
 
     const request: AccessRequest = {
-      drone_id: smallDrone.ID.toString(),
-      request_target: target,
+      drone_id: smallDrone.ID !== undefined ? smallDrone.ID.toString() : "",
+      request_target: zone,
     };
 
     try {
@@ -116,7 +103,7 @@ export default function Home() {
   };
 
   return (
-    <Container>
+    <Container maxWidth={"lg"} className="relative">
       <Box
         display="flex"
         flexDirection="column"
@@ -130,6 +117,7 @@ export default function Home() {
           mb={8}
           display="flex"
           flexDirection="row"
+          alignItems={"center"}
           // justifyContent={"space-between"}
         >
           <FormControl
@@ -153,7 +141,7 @@ export default function Home() {
             <InputLabel id="zone-label">Zone</InputLabel>
             <Select
               labelId="zone-label"
-              value={zone}
+              type="number"
               onChange={handleZoneChange}
               label="Zone"
             >
@@ -164,6 +152,9 @@ export default function Home() {
               ))}
             </Select>
           </FormControl>
+          <div className="absolute right-0">
+            <Link href="/admin">Admin →</Link>
+          </div>
         </Box>
         <Box display="flex" justifyContent="space-between" maxWidth={"lg"}>
           <Box mr={3}>
@@ -171,7 +162,7 @@ export default function Home() {
               <InputLabel id="drone-label">Select Small Drone</InputLabel>
               <Select
                 labelId="drone-label"
-                value={smallDrone}
+                value={smallDrone?.ID}
                 onChange={handleSmallDroneChange}
                 label="Select Small Drone"
               >
@@ -197,55 +188,35 @@ export default function Home() {
                   <Typography>ID: {smallDrone.ID}</Typography>
                   <Typography>Type: {smallDrone.model_type}</Typography>
                   <Typography>Zone: {smallDrone.zone}</Typography>
-                  <Typography className="mb-10">
-                    Level: {smallDrone.level}
-                  </Typography>
-                  <FormControl variant="outlined" className="max-w-52 mb-5">
-                    <InputLabel id="target-label">Select target</InputLabel>
-                    <Select
-                      labelId="target-label"
-                      value={target}
-                      onChange={handleTargetChange}
-                      label="Select Target"
-                    >
-                      {targets.map((target, index) => (
-                        <MenuItem value={target} key={index}>
-                          Area {target}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <Typography mt={2} mb={2}>
-                    Access Request to the Area{" "}
-                    <span className="font-bold">{target}</span>
-                  </Typography>
-                  <div>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleSendRequest}
-                    >
-                      Send Request
-                    </Button>
-                  </div>
                 </>
               ) : (
                 <Typography>No small drone selected</Typography>
               )}
             </Paper>
           </Box>
+          <div className="my-auto mx-auto flex flex-col items-center">
+            <div>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSendRequest}
+              >
+                Send Request
+              </Button>
+            </div>
+          </div>
           <Box>
             <FormControl variant="outlined" className="min-w-52 mb-10">
               <InputLabel id="drone-label">Select Terminal Drone</InputLabel>
               <Select
                 labelId="drone-label"
-                value={drones[0]}
-                // onChange={handleDroneChange}
+                value={terminalDrone?.ID}
+                onChange={handleTerminalDroneChange}
                 label="Select Terminal Drone"
               >
                 {drones.map((drone: Drone, index) =>
                   drone.model_type === "Terminal" ? (
-                    <MenuItem value={drone.ID} key={index}>
+                    <MenuItem value={index} key={index}>
                       {drone.ID}
                     </MenuItem>
                   ) : null
@@ -267,8 +238,17 @@ export default function Home() {
                   <Typography>Zone: {terminalDrone.zone}</Typography>
                 </>
               ) : (
-                <Typography>No small drone selected</Typography>
+                <Typography>No Terminal drone selected</Typography>
               )}
+              {accessResponse ? (
+                <Typography
+                  variant="h6"
+                  color={accessResponse.granted === true ? "blue" : "red"}
+                  mt={4}
+                >
+                  {accessResponse.message}
+                </Typography>
+              ) : null}
             </Paper>
           </Box>
         </Box>
