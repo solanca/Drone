@@ -46,12 +46,12 @@ const Attributes: React.FC = () => {
     fetchAttribute();
   }, []);
 
-  const handleClickOpen = () => {
-    setEditMode(false);
-    setAttributeName("");
-    setAttributeValue([]);
-    setOpen(true);
-  };
+  // const handleClickOpen = () => {
+  //   setEditMode(false);
+  //   setAttributeName("");
+  //   setAttributeValue([]);
+  //   setOpen(true);
+  // };
 
   const handleEdit = (attribute: Attribute) => {
     setEditMode(true);
@@ -63,14 +63,14 @@ const Attributes: React.FC = () => {
     setOpen(true);
   };
 
-  const handleDelete = async (attributeId: string | null) => {
-    try {
-      await DeleteAttribute(attributeId);
-      setAttributes(attributes.filter((attr) => attr.ID !== attributeId));
-    } catch (error) {
-      console.error("Error deleting attributes:", error);
-    }
-  };
+  // const handleDelete = async (attributeId: string | null) => {
+  //   try {
+  //     await DeleteAttribute(attributeId);
+  //     setAttributes(attributes.filter((attr) => attr.ID !== attributeId));
+  //   } catch (error) {
+  //     console.error("Error deleting attributes:", error);
+  //   }
+  // };
   const handleClose = () => {
     setOpen(false);
   };
