@@ -111,11 +111,11 @@ const Attributes: React.FC = () => {
       <Typography variant="h4" gutterBottom>
         Manage Attributes
       </Typography>
-      <Box display="flex" justifyContent="space-between" mb={2}>
+      {/* <Box display="flex" justifyContent="space-between" mb={2}>
         <Button variant="contained" color="primary" onClick={handleClickOpen}>
           Add Attribute
         </Button>
-      </Box>
+      </Box> */}
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -143,7 +143,7 @@ const Attributes: React.FC = () => {
                   >
                     Edit
                   </Button>
-                  <Button
+                  {/* <Button
                     variant="contained"
                     color="primary"
                     onClick={() =>
@@ -153,7 +153,7 @@ const Attributes: React.FC = () => {
                     }
                   >
                     Delete
-                  </Button>
+                  </Button> */}
                 </TableCell>
               </TableRow>
             ))}
