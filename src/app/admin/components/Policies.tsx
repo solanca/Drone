@@ -23,8 +23,9 @@ import {
   fetchPolicies,
   UpdatePolicy,
 } from "@/app/api";
+import Loading from "@/app/components/Loading";
 
-const Drones: React.FC = () => {
+const Policies: React.FC = () => {
   const [policies, setPolicies] = useState<Policy[]>([]);
   const [open, setOpen] = useState(false);
   const [zone, setZone] = useState<number>(NaN);
@@ -32,14 +33,19 @@ const Drones: React.FC = () => {
   const [endTime, setEndTime] = useState("");
   const [currentPolicyId, setCurrentPolicyId] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("Fetching policies...");
 
   useEffect(() => {
     const fetchPolicy = async () => {
+      setLoading(true);
       try {
         const policyData = await fetchPolicies();
         setPolicies(policyData);
       } catch (error) {
         console.error("Error fetching zones:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchPolicy();
@@ -56,6 +62,7 @@ const Drones: React.FC = () => {
   const handleEdit = (policy: Policy) => {
     setEditMode(true);
     setCurrentPolicyId(policy.ID !== undefined ? policy.ID : null);
+    setZone(policy.zone);
     setStartTime(policy.start_time);
     setEndTime(policy.end_time);
     setOpen(true);
@@ -63,10 +70,14 @@ const Drones: React.FC = () => {
 
   const handleDelete = async (policyId: string | null) => {
     try {
+      setLoading(true);
+      setMessage("Deleting policy...");
       await DeletePolicy(policyId);
       setPolicies(policies.filter((policy) => policy.ID !== policyId));
     } catch (error) {
       console.error("Error deleting drones:", error);
+    } finally {
+      setLoading(false);
     }
   };
   const handleClose = () => {
@@ -81,7 +92,10 @@ const Drones: React.FC = () => {
     };
 
     try {
+      setLoading(true);
       if (editMode && currentPolicyId !== null) {
+        setMessage("Saving policy...");
+        console.log(currentPolicyId);
         const updatedPolicy = await UpdatePolicy(newPolicy, currentPolicyId);
         setPolicies(
           policies.map((policy) =>
@@ -89,14 +103,21 @@ const Drones: React.FC = () => {
           )
         );
       } else {
+        setMessage("Creating policy...");
         const createdPolicy = await CreatePolicy(newPolicy);
         setPolicies([...policies, createdPolicy]);
       }
       handleClose();
     } catch (error) {
       console.error("Error adding drones:", error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) {
+    return <Loading message={message} />;
+  }
 
   return (
     <Box>
@@ -192,4 +213,4 @@ const Drones: React.FC = () => {
   );
 };
 
-export default Drones;
+export default Policies;

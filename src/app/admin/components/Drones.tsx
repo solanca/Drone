@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import { Drone } from "../types";
 import { CreateDrone, DeleteDrone, fetchDrones, UpdateDrone } from "@/app/api";
+import Loading from "@/app/components/Loading";
 
 const Drones: React.FC = () => {
   const [drones, setDrones] = useState<Drone[]>([]);
@@ -26,14 +27,19 @@ const Drones: React.FC = () => {
   const [zone, setZone] = useState(NaN);
   const [currentDroneId, setCurrentDroneId] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("Fetching drones...");
 
   useEffect(() => {
     const fetchDrone = async () => {
       try {
+        setLoading(true);
         const droneData = await fetchDrones();
         setDrones(droneData);
       } catch (error) {
         console.error("Error fetching zones:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchDrone();
@@ -56,10 +62,14 @@ const Drones: React.FC = () => {
 
   const handleDelete = async (droneId: string | null) => {
     try {
+      setMessage("Deleting Drone...");
+      setLoading(true);
       await DeleteDrone(droneId);
       setDrones(drones.filter((drone) => drone.ID !== droneId));
     } catch (error) {
       console.error("Error deleting drones:", error);
+    } finally {
+      setLoading(false);
     }
   };
   const handleClose = () => {
@@ -73,22 +83,35 @@ const Drones: React.FC = () => {
     };
 
     try {
+      setLoading(true);
       if (editMode && currentDroneId !== null) {
+        setMessage("Saving Drone...");
         const updatedDrone = await UpdateDrone(newDrone, currentDroneId);
         setDrones(
           drones.map((drone) =>
             drone.ID === currentDroneId ? updatedDrone : drone
           )
         );
+        // const droneData = await fetchDrones();
+        // setDrones(droneData);
       } else {
+        setMessage("Creating Drone...");
         const createdDrone = await CreateDrone(newDrone);
         setDrones([...drones, createdDrone]);
+        // const droneData = await fetchDrones();
+        // setDrones(droneData);
       }
       handleClose();
     } catch (error) {
       console.error("Error adding drones:", error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) {
+    return <Loading message={message} />;
+  }
 
   return (
     <Box>

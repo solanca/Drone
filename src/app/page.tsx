@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container,
   Box,
@@ -22,22 +22,32 @@ import {
   sendAccessRequest,
 } from "./api";
 import { Drone } from "./admin/types";
+import Loading from "./components/Loading";
 
 export default function Home() {
-  const [layer, setLayer] = React.useState("");
+  const [layer, setLayer] = useState("1");
   const [zone, setZone] = React.useState<number>(NaN);
   const [drones, setDrones] = React.useState<Drone[]>([]);
   const [smallDrone, setSmallDrone] = React.useState<Drone | null>(null);
   const [terminalDrone, setTerminalDrone] = React.useState<Drone | null>(null);
-
+  const [message, setMessage] = React.useState("Fetching data...");
   const [zones, setZones] = React.useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const [accessResponse, setAccessResponse] =
     React.useState<AccessResponse | null>(null);
 
   useEffect(() => {
+    const storedLayer = localStorage.getItem("layer");
+    if (storedLayer) {
+      setLayer(storedLayer);
+    }
+  }, [layer]);
+
+  useEffect(() => {
     const fetchZones = async () => {
       try {
+        setLoading(true);
         const zonesData = await fetchAttributesByName("Zone");
         const zonesValues = zonesData.reduce(
           (acc: string[], attr: { value: string[] }) => acc.concat(attr.value),
@@ -46,22 +56,27 @@ export default function Home() {
         setZones(zonesValues);
       } catch (error) {
         console.error("Error fetching zones:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchZones();
-  }, []);
+  }, [layer]);
 
   const handleLayerChange = (event: SelectChangeEvent<string>) => {
-    setLayer(event.target.value as string);
+    localStorage.setItem("layer", event.target.value);
+    setLayer(event.target.value);
   };
 
   const handleZoneChange = async (event: SelectChangeEvent<string>) => {
+    setMessage("Fetching Zones...");
+    setLoading(true);
     const selectedZone = event.target.value as string;
     setZone(Number(event.target.value));
 
     try {
       const drones = await fetchDronesByZone(Number(selectedZone));
-      setDrones(drones);
+      setDrones(drones === null ? [] : drones);
 
       const firstSmallDrone =
         drones.find((drone: Drone) => drone.model_type === "Small") || null;
@@ -72,15 +87,22 @@ export default function Home() {
       setTerminalDrone(firstTerminalDrone);
     } catch (error) {
       console.error("Error fetching drones:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSmallDroneChange = (event: SelectChangeEvent<any>) => {
-    setSmallDrone(drones[event.target.value as number]);
+    setSmallDrone(
+      drones.find((drone: Drone) => drone.ID === event.target.value) || null
+    );
+    console.log(smallDrone);
   };
 
   const handleTerminalDroneChange = (event: SelectChangeEvent<any>) => {
-    setTerminalDrone(drones[event.target.value as number]);
+    setTerminalDrone(
+      drones.find((drone: Drone) => drone.ID === event.target.value) || null
+    );
   };
 
   const handleSendRequest = async () => {
@@ -90,17 +112,25 @@ export default function Home() {
     }
 
     const request: AccessRequest = {
-      drone_id: smallDrone.ID !== undefined ? smallDrone.ID.toString() : "",
+      entity_id: smallDrone.ID !== undefined ? smallDrone.ID.toString() : "",
       request_target: zone,
     };
 
     try {
+      setMessage("Accessing Request...");
+      setLoading(true);
       const response = await sendAccessRequest(request);
       setAccessResponse(response);
     } catch (error) {
       console.error("Error sending access request:", error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) {
+    return <Loading message={message} />;
+  }
 
   return (
     <Container maxWidth={"lg"} className="relative">
@@ -131,10 +161,10 @@ export default function Home() {
               onChange={handleLayerChange}
               label="Layer"
             >
-              <MenuItem value="Layer 0">Layer 0</MenuItem>
-              <MenuItem value="Layer 1">Layer 1</MenuItem>
-              <MenuItem value="Layer 2">Layer 2</MenuItem>
-              <MenuItem value="Layer 3">Layer 3</MenuItem>
+              <MenuItem value={1}>Layer 1</MenuItem>
+              <MenuItem value={2}>Layer 2</MenuItem>
+              <MenuItem value={3}>Layer 3</MenuItem>
+              <MenuItem value={4}>Layer 4</MenuItem>
             </Select>
           </FormControl>
           <FormControl variant="outlined" className="w-full max-w-28">
@@ -142,6 +172,7 @@ export default function Home() {
             <Select
               labelId="zone-label"
               type="number"
+              value={zone.toString()}
               onChange={handleZoneChange}
               label="Zone"
             >
@@ -168,7 +199,7 @@ export default function Home() {
               >
                 {drones.map((drone: Drone, index) =>
                   drone.model_type === "Small" ? (
-                    <MenuItem value={index} key={index}>
+                    <MenuItem value={drone.ID} key={index}>
                       {drone.ID}
                     </MenuItem>
                   ) : null
@@ -216,7 +247,7 @@ export default function Home() {
               >
                 {drones.map((drone: Drone, index) =>
                   drone.model_type === "Terminal" ? (
-                    <MenuItem value={index} key={index}>
+                    <MenuItem value={drone.ID} key={index}>
                       {drone.ID}
                     </MenuItem>
                   ) : null
@@ -246,13 +277,16 @@ export default function Home() {
                   color={accessResponse.granted === true ? "blue" : "red"}
                   mt={4}
                 >
-                  {accessResponse.message}
+                  {accessResponse.granted
+                    ? "Access request processed"
+                    : "Access request denied"}
                 </Typography>
               ) : null}
             </Paper>
           </Box>
         </Box>
       </Box>
+      {/* <Loading /> */}
     </Container>
   );
 }

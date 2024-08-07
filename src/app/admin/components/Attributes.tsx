@@ -23,6 +23,7 @@ import {
   fetchAttributes,
   UpdateAttribute,
 } from "@/app/api";
+import Loading from "@/app/components/Loading";
 
 const Attributes: React.FC = () => {
   const [attributes, setAttributes] = useState<Attribute[]>([]);
@@ -33,14 +34,19 @@ const Attributes: React.FC = () => {
     null
   );
   const [editMode, setEditMode] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("Fetching attributes...");
 
   useEffect(() => {
     const fetchAttribute = async () => {
       try {
+        setLoading(true);
         const attributeData = await fetchAttributes();
         setAttributes(attributeData);
       } catch (error) {
         console.error("Error fetching attributes:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchAttribute();
@@ -82,7 +88,9 @@ const Attributes: React.FC = () => {
     };
 
     try {
+      setLoading(true);
       if (editMode && currentAttributeId !== null) {
+        setMessage("Saving attribute...");
         const updatedAttribute = await UpdateAttribute(
           newAttribute,
           currentAttributeId
@@ -93,18 +101,25 @@ const Attributes: React.FC = () => {
           )
         );
       } else {
+        setMessage("Creating attribute...");
         const createdAttribute = await CreateAttribute(newAttribute);
         setAttributes([...attributes, createdAttribute]);
       }
       handleClose();
     } catch (error) {
       console.error("Error adding attributes:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAttributeValue(event.target.value.split(",").map((val) => val.trim()));
   };
+
+  if (loading) {
+    return <Loading message={message} />;
+  }
 
   return (
     <Box>

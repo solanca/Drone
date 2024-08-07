@@ -1,7 +1,7 @@
 import { Attribute, Drone, Policy } from "./admin/types";
 
 export interface AccessRequest {
-  drone_id: string;
+  entity_id: string;
   request_target: number;
 }
 
@@ -11,9 +11,14 @@ export interface AccessResponse {
 }
 
 export const fetchDronesByZone = async (zone: number) => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/drones/zone/${zone}`
-  );
+  const layer = localStorage.getItem("layer");
+  var endpoint;
+  if (layer === "4") {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
+  } else {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";
+  }
+  const response = await fetch(`${endpoint}/getDronesByZone/${zone}`);
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
@@ -21,9 +26,14 @@ export const fetchDronesByZone = async (zone: number) => {
 };
 
 export const fetchAttributesByName = async (name: string) => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/attributes/${name}`
-  );
+  const layer = localStorage.getItem("layer");
+  var endpoint;
+  if (layer === "4") {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
+  } else {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";
+  }
+  const response = await fetch(`${endpoint}/getAttributeByName/${name}`);
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
@@ -31,16 +41,24 @@ export const fetchAttributesByName = async (name: string) => {
 };
 
 export const sendAccessRequest = async (request: AccessRequest) => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/access-request`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(request),
-    }
-  );
+  const layer = localStorage.getItem("layer");
+  var endpoint;
+  if (layer === "1") {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";
+  } else if (layer === "2") {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/layer-2";
+  } else if (layer === "3") {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/layer-3";
+  } else {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
+  }
+  const response = await fetch(`${endpoint}/accessRequest`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(request),
+  });
 
   if (!response.ok) {
     throw new Error("Network response was not ok");
@@ -50,7 +68,14 @@ export const sendAccessRequest = async (request: AccessRequest) => {
 };
 
 export const fetchDrones = async () => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/drones`);
+  const layer = localStorage.getItem("layer");
+  var endpoint;
+  if (layer === "4") {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
+  } else {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";
+  }
+  const response = await fetch(`${endpoint}/getDrones`);
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
@@ -58,7 +83,14 @@ export const fetchDrones = async () => {
 };
 
 export const fetchPolicies = async () => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/policies`);
+  const layer = localStorage.getItem("layer");
+  var endpoint;
+  if (layer === "4" || layer === "3") {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
+  } else {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";
+  }
+  const response = await fetch(`${endpoint}/getPolicies`);
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
@@ -66,7 +98,14 @@ export const fetchPolicies = async () => {
 };
 
 export const fetchAttributes = async () => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/attributes`);
+  const layer = localStorage.getItem("layer");
+  var endpoint;
+  if (layer === "4") {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
+  } else {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";
+  }
+  const response = await fetch(`${endpoint}/getAttributes`);
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
@@ -75,7 +114,7 @@ export const fetchAttributes = async () => {
 
 export const CreateAttribute = async (newAttribute: Attribute) => {
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/attributes`,
+    `${process.env.NEXT_PUBLIC_API_URL}/createAttribute`,
     {
       method: "POST",
       headers: {
@@ -93,16 +132,20 @@ export const CreateAttribute = async (newAttribute: Attribute) => {
 };
 
 export const UpdateAttribute = async (newAttribute: Attribute, id: string) => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/attributes/${id}`,
-    {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newAttribute),
-    }
-  );
+  const layer = localStorage.getItem("layer");
+  var endpoint;
+  if (layer === "4") {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
+  } else {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";
+  }
+  const response = await fetch(`${endpoint}/updateAttribute/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newAttribute),
+  });
   if (!response) {
     throw new Error("Network response was not ok");
   }
@@ -112,7 +155,7 @@ export const UpdateAttribute = async (newAttribute: Attribute, id: string) => {
 
 export const DeleteAttribute = async (attributeId: string | null) => {
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/attributes/${attributeId}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/removeAttribute/${attributeId}`,
     {
       method: "DELETE",
     }
@@ -123,7 +166,14 @@ export const DeleteAttribute = async (attributeId: string | null) => {
 };
 
 export const CreateDrone = async (newDrone: Drone) => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/drones`, {
+  const layer = localStorage.getItem("layer");
+  var endpoint;
+  if (layer === "4") {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
+  } else {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";
+  }
+  const response = await fetch(`${endpoint}/createDrone`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -139,16 +189,20 @@ export const CreateDrone = async (newDrone: Drone) => {
 };
 
 export const UpdateDrone = async (newDrone: Drone, id: string) => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/drones/${id}`,
-    {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newDrone),
-    }
-  );
+  const layer = localStorage.getItem("layer");
+  var endpoint;
+  if (layer === "4") {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
+  } else {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";
+  }
+  const response = await fetch(`${endpoint}/updateDrone/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newDrone),
+  });
   if (!response) {
     throw new Error("Network response was not ok");
   }
@@ -157,19 +211,30 @@ export const UpdateDrone = async (newDrone: Drone, id: string) => {
 };
 
 export const DeleteDrone = async (droneId: string | null) => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/drones/${droneId}`,
-    {
-      method: "DELETE",
-    }
-  );
+  const layer = localStorage.getItem("layer");
+  var endpoint;
+  if (layer === "4") {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
+  } else {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";
+  }
+  const response = await fetch(`${endpoint}/removeDrone/${droneId}`, {
+    method: "DELETE",
+  });
   if (!response) {
     throw new Error("Network response was not ok");
   }
 };
 
 export const CreatePolicy = async (newPolicy: Policy) => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/policies`, {
+  const layer = localStorage.getItem("layer");
+  var endpoint;
+  if (layer === "4" || layer == "3") {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
+  } else {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";
+  }
+  const response = await fetch(`${endpoint}/createPolicy`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -185,16 +250,20 @@ export const CreatePolicy = async (newPolicy: Policy) => {
 };
 
 export const UpdatePolicy = async (newPolicy: Policy, id: string) => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/policies/${id}`,
-    {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newPolicy),
-    }
-  );
+  const layer = localStorage.getItem("layer");
+  var endpoint;
+  if (layer === "4" || layer == "3") {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
+  } else {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";
+  }
+  const response = await fetch(`${endpoint}/updatePolicy/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newPolicy),
+  });
   if (!response) {
     throw new Error("Network response was not ok");
   }
@@ -203,12 +272,16 @@ export const UpdatePolicy = async (newPolicy: Policy, id: string) => {
 };
 
 export const DeletePolicy = async (policyId: string | null) => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/policies/${policyId}`,
-    {
-      method: "DELETE",
-    }
-  );
+  const layer = localStorage.getItem("layer");
+  var endpoint;
+  if (layer === "4" || layer == "3") {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
+  } else {
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";
+  }
+  const response = await fetch(`${endpoint}/removePolicy/${policyId}`, {
+    method: "DELETE",
+  });
   if (!response) {
     throw new Error("Network response was not ok");
   }
