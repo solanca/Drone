@@ -24,18 +24,21 @@ import {
   UpdateAttribute,
 } from "@/app/api";
 import Loading from "@/app/components/Loading";
+import { LoadingButton } from "@mui/lab";
 
 const Attributes: React.FC = () => {
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [open, setOpen] = useState(false);
   const [attributeName, setAttributeName] = useState("");
   const [attributeValue, setAttributeValue] = useState<string[]>([]);
+  const [rawAttributeValue, setRawAttributeValue] = useState(""); // New state for raw input
   const [currentAttributeId, setCurrentAttributeId] = useState<string | null>(
     null
   );
   const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("Fetching attributes...");
+  const [sendLoading, setSendLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchAttribute = async () => {
@@ -52,31 +55,15 @@ const Attributes: React.FC = () => {
     fetchAttribute();
   }, []);
 
-  // const handleClickOpen = () => {
-  //   setEditMode(false);
-  //   setAttributeName("");
-  //   setAttributeValue([]);
-  //   setOpen(true);
-  // };
-
   const handleEdit = (attribute: Attribute) => {
     setEditMode(true);
-    console.log(attribute.ID);
-    console.log(attribute);
     setCurrentAttributeId(attribute.ID !== undefined ? attribute.ID : null);
     setAttributeName(attribute.name);
     setAttributeValue(attribute.value);
+    setRawAttributeValue(attribute.value.join(", ")); // Initialize raw input
     setOpen(true);
   };
 
-  // const handleDelete = async (attributeId: string | null) => {
-  //   try {
-  //     await DeleteAttribute(attributeId);
-  //     setAttributes(attributes.filter((attr) => attr.ID !== attributeId));
-  //   } catch (error) {
-  //     console.error("Error deleting attributes:", error);
-  //   }
-  // };
   const handleClose = () => {
     setOpen(false);
   };
@@ -84,11 +71,14 @@ const Attributes: React.FC = () => {
   const handleSaveAddAttribute = async () => {
     const newAttribute: Attribute = {
       name: attributeName,
-      value: attributeValue,
+      value: rawAttributeValue
+        .split(",")
+        .map((val) => val.trim())
+        .filter((val) => val), // Split raw input into array
     };
 
     try {
-      setLoading(true);
+      setSendLoading(true);
       if (editMode && currentAttributeId !== null) {
         setMessage("Saving attribute...");
         const updatedAttribute = await UpdateAttribute(
@@ -109,28 +99,19 @@ const Attributes: React.FC = () => {
     } catch (error) {
       console.error("Error adding attributes:", error);
     } finally {
-      setLoading(false);
+      setSendLoading(false);
     }
   };
 
   const handleValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAttributeValue(event.target.value.split(",").map((val) => val.trim()));
+    setRawAttributeValue(event.target.value);
   };
-
-  if (loading) {
-    return <Loading message={message} />;
-  }
 
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
         Manage Attributes
       </Typography>
-      {/* <Box display="flex" justifyContent="space-between" mb={2}>
-        <Button variant="contained" color="primary" onClick={handleClickOpen}>
-          Add Attribute
-        </Button>
-      </Box> */}
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -158,17 +139,6 @@ const Attributes: React.FC = () => {
                   >
                     Edit
                   </Button>
-                  {/* <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() =>
-                      handleDelete(
-                        attribute.ID !== undefined ? attribute.ID : null
-                      )
-                    }
-                  >
-                    Delete
-                  </Button> */}
                 </TableCell>
               </TableRow>
             ))}
@@ -176,7 +146,7 @@ const Attributes: React.FC = () => {
         </Table>
       </TableContainer>
 
-      {/* Add Attribute Dialog */}
+      {/* Add/Edit Attribute Dialog */}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>
           {editMode ? "Edit Attribute" : "Add New Attribute"}
@@ -194,19 +164,34 @@ const Attributes: React.FC = () => {
             margin="dense"
             label="Attribute Values (comma-separated)"
             fullWidth
-            value={attributeValue.join(", ")}
+            value={rawAttributeValue}
             onChange={handleValueChange}
+            onBlur={() =>
+              setAttributeValue(
+                rawAttributeValue
+                  .split(",")
+                  .map((val) => val.trim())
+                  .filter((val) => val)
+              )
+            } // Update attributeValue on blur
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="secondary">
             Cancel
           </Button>
-          <Button onClick={handleSaveAddAttribute} color="primary">
+          <LoadingButton
+            loading={sendLoading}
+            loadingPosition="end"
+            variant="text"
+            sx={{ width: "100px" }}
+            onClick={handleSaveAddAttribute}
+          >
             {editMode ? "Update" : "Add"}
-          </Button>
+          </LoadingButton>
         </DialogActions>
       </Dialog>
+      {loading ? <Loading message={message} /> : null}
     </Box>
   );
 };

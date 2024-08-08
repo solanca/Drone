@@ -24,6 +24,7 @@ import {
   UpdatePolicy,
 } from "@/app/api";
 import Loading from "@/app/components/Loading";
+import { LoadingButton } from "@mui/lab";
 
 const Policies: React.FC = () => {
   const [policies, setPolicies] = useState<Policy[]>([]);
@@ -35,6 +36,7 @@ const Policies: React.FC = () => {
   const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("Fetching policies...");
+  const [sendLoading, setSendLoading] = useState(false);
 
   useEffect(() => {
     const fetchPolicy = async () => {
@@ -92,7 +94,7 @@ const Policies: React.FC = () => {
     };
 
     try {
-      setLoading(true);
+      setSendLoading(true);
       if (editMode && currentPolicyId !== null) {
         setMessage("Saving policy...");
         console.log(currentPolicyId);
@@ -111,13 +113,9 @@ const Policies: React.FC = () => {
     } catch (error) {
       console.error("Error adding drones:", error);
     } finally {
-      setLoading(false);
+      setSendLoading(false);
     }
   };
-
-  if (loading) {
-    return <Loading message={message} />;
-  }
 
   return (
     <Box>
@@ -204,11 +202,18 @@ const Policies: React.FC = () => {
           <Button onClick={handleClose} color="secondary">
             Cancel
           </Button>
-          <Button onClick={handleSaveAddPolicy} color="primary">
+          <LoadingButton
+            loading={sendLoading}
+            loadingPosition="end"
+            variant="text"
+            sx={{ width: "100px" }}
+            onClick={handleSaveAddPolicy}
+          >
             {editMode ? "Update" : "Add"}
-          </Button>
+          </LoadingButton>
         </DialogActions>
       </Dialog>
+      {loading ? <Loading message={message} /> : null}
     </Box>
   );
 };

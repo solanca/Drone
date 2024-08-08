@@ -12,6 +12,7 @@ import {
   Typography,
   Paper,
   Link,
+  IconButton,
 } from "@mui/material";
 import { SelectChangeEvent } from "@mui/material/Select";
 import {
@@ -23,6 +24,7 @@ import {
 } from "./api";
 import { Drone } from "./admin/types";
 import Loading from "./components/Loading";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 export default function Home() {
   const [layer, setLayer] = useState("1");
@@ -33,6 +35,7 @@ export default function Home() {
   const [message, setMessage] = React.useState("Fetching data...");
   const [zones, setZones] = React.useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [sendLoading, setSendLoading] = useState<boolean>(false);
 
   const [accessResponse, setAccessResponse] =
     React.useState<AccessResponse | null>(null);
@@ -117,20 +120,19 @@ export default function Home() {
     };
 
     try {
-      setMessage("Accessing Request...");
-      setLoading(true);
+      setSendLoading(true);
       const response = await sendAccessRequest(request);
       setAccessResponse(response);
     } catch (error) {
       console.error("Error sending access request:", error);
     } finally {
-      setLoading(false);
+      setSendLoading(false);
     }
   };
 
-  if (loading) {
-    return <Loading message={message} />;
-  }
+  // if (loading) {
+  //   return <Loading message={message} />;
+  // }
 
   return (
     <Container maxWidth={"lg"} className="relative">
@@ -227,13 +229,22 @@ export default function Home() {
           </Box>
           <div className="my-auto mx-auto flex flex-col items-center">
             <div>
-              <Button
+              {/* <Button
                 variant="contained"
                 color="primary"
                 onClick={handleSendRequest}
               >
                 Send Request
-              </Button>
+              </Button> */}
+              <LoadingButton
+                loading={sendLoading}
+                loadingPosition="end"
+                variant="contained"
+                sx={{ width: "190px" }}
+                onClick={handleSendRequest}
+              >
+                Send Request
+              </LoadingButton>
             </div>
           </div>
           <Box>
@@ -286,7 +297,7 @@ export default function Home() {
           </Box>
         </Box>
       </Box>
-      {/* <Loading /> */}
+      {loading ? <Loading message={message} /> : null}
     </Container>
   );
 }

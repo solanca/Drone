@@ -19,6 +19,7 @@ import {
 import { Drone } from "../types";
 import { CreateDrone, DeleteDrone, fetchDrones, UpdateDrone } from "@/app/api";
 import Loading from "@/app/components/Loading";
+import { LoadingButton } from "@mui/lab";
 
 const Drones: React.FC = () => {
   const [drones, setDrones] = useState<Drone[]>([]);
@@ -29,6 +30,7 @@ const Drones: React.FC = () => {
   const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("Fetching drones...");
+  const [sendLoading, setSendLoading] = useState(false);
 
   useEffect(() => {
     const fetchDrone = async () => {
@@ -83,7 +85,7 @@ const Drones: React.FC = () => {
     };
 
     try {
-      setLoading(true);
+      setSendLoading(true);
       if (editMode && currentDroneId !== null) {
         setMessage("Saving Drone...");
         const updatedDrone = await UpdateDrone(newDrone, currentDroneId);
@@ -105,13 +107,13 @@ const Drones: React.FC = () => {
     } catch (error) {
       console.error("Error adding drones:", error);
     } finally {
-      setLoading(false);
+      setSendLoading(false);
     }
   };
 
-  if (loading) {
-    return <Loading message={message} />;
-  }
+  // if (loading) {
+  //   return <Loading message={message} />;
+  // }
 
   return (
     <Box>
@@ -192,11 +194,18 @@ const Drones: React.FC = () => {
           <Button onClick={handleClose} color="secondary">
             Cancel
           </Button>
-          <Button onClick={handleSaveAddDrone} color="primary">
+          <LoadingButton
+            loading={sendLoading}
+            loadingPosition="end"
+            variant="text"
+            sx={{ width: "100px" }}
+            onClick={handleSaveAddDrone}
+          >
             {editMode ? "Update" : "Add"}
-          </Button>
+          </LoadingButton>
         </DialogActions>
       </Dialog>
+      {loading ? <Loading message={message} /> : null}
     </Box>
   );
 };
