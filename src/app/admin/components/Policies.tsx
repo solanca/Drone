@@ -43,7 +43,7 @@ const Policies: React.FC = () => {
       setLoading(true);
       try {
         const policyData = await fetchPolicies();
-        setPolicies(policyData);
+        setPolicies(policyData === null ? [] : policyData);
       } catch (error) {
         console.error("Error fetching zones:", error);
       } finally {

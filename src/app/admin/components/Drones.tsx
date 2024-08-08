@@ -37,7 +37,7 @@ const Drones: React.FC = () => {
       try {
         setLoading(true);
         const droneData = await fetchDrones();
-        setDrones(droneData);
+        setDrones(droneData === null ? [] : droneData);
       } catch (error) {
         console.error("Error fetching zones:", error);
       } finally {

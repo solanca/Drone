@@ -45,7 +45,7 @@ const Attributes: React.FC = () => {
       try {
         setLoading(true);
         const attributeData = await fetchAttributes();
-        setAttributes(attributeData);
+        setAttributes(attributeData === null ? [] : attributeData);
       } catch (error) {
         console.error("Error fetching attributes:", error);
       } finally {
