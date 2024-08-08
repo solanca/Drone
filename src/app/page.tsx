@@ -190,7 +190,7 @@ export default function Home() {
           </div>
         </Box>
         <Box display="flex" justifyContent="space-between" maxWidth={"lg"}>
-          <Box mr={3}>
+          <Box>
             <FormControl variant="outlined" className="min-w-52 mb-10">
               <InputLabel id="drone-label">Select Small Drone</InputLabel>
               <Select
