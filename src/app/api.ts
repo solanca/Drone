@@ -44,13 +44,13 @@ export const sendAccessRequest = async (request: AccessRequest) => {
   const layer = localStorage.getItem("layer");
   var endpoint;
   if (layer === "1") {
-    endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/layer-1";
   } else if (layer === "2") {
     endpoint = process.env.NEXT_PUBLIC_API_URL + "/layer-2";
   } else if (layer === "3") {
     endpoint = process.env.NEXT_PUBLIC_API_URL + "/layer-3";
   } else {
-    endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
+    endpoint = process.env.NEXT_PUBLIC_API_URL + "/layer-4";
   }
   const response = await fetch(`${endpoint}/accessRequest`, {
     method: "POST",
