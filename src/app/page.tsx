@@ -32,7 +32,6 @@ export default function Home() {
   const [drones, setDrones] = React.useState<Drone[]>([]);
   const [smallDrone, setSmallDrone] = React.useState<Drone | null>(null);
   const [terminalDrone, setTerminalDrone] = React.useState<Drone | null>(null);
-  const [message, setMessage] = React.useState("Fetching data...");
   const [zones, setZones] = React.useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [sendLoading, setSendLoading] = useState<boolean>(false);
@@ -72,7 +71,6 @@ export default function Home() {
   };
 
   const handleZoneChange = async (event: SelectChangeEvent<string>) => {
-    setMessage("Fetching Zones...");
     setLoading(true);
     const selectedZone = event.target.value as string;
     setZone(Number(event.target.value));
@@ -297,7 +295,7 @@ export default function Home() {
           </Box>
         </Box>
       </Box>
-      {loading ? <Loading message={message} /> : null}
+      {loading ? <Loading /> : null}
     </Container>
   );
 }
