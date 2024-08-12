@@ -39,7 +39,7 @@ export default function ClientLayout({
             component="div"
             sx={{ flexGrow: 1, marginLeft: 2 }}
           >
-            Drone Access Manager
+            Drone Access Control
           </Typography>
           <Typography variant="h6" component="div" sx={{ marginRight: 2 }}>
             {layer === "" ? "" : `Layer ${layer}`}
