@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Drawer,
   List,
@@ -16,9 +16,18 @@ import {
 import Drones from "./components/Drones";
 import Attributes from "./components/Attributes";
 import Policies from "./components/Policies";
+import { useLayer } from "../context/LayerContext";
 
 const AdminPage: React.FC = () => {
+  const { layer, setLayer } = useLayer();
   const [selectedTab, setSelectedTab] = useState<number>(0);
+
+  useEffect(() => {
+    const storedLayer = localStorage.getItem("layer");
+    if (storedLayer) {
+      setLayer(storedLayer);
+    }
+  }, [setLayer]);
 
   console.log(selectedTab);
 
@@ -60,12 +69,7 @@ const AdminPage: React.FC = () => {
         </Tabs>
       </Box>
       <Container className="relative" maxWidth="lg">
-        {/* <AppBar position="static">
-          <Toolbar>
-            <Typography variant="h6">Admin Panel</Typography>
-          </Toolbar>
-        </AppBar> */}
-        <div className="absolute right-0 top-10">
+        <div className="absolute right-0 top-10 text-right">
           <Link href="/">Frontend →</Link>
         </div>
         <Box mt={2}>{renderContent()}</Box>
@@ -75,3 +79,6 @@ const AdminPage: React.FC = () => {
 };
 
 export default AdminPage;
+function setLayer(storedLayer: string) {
+  throw new Error("Function not implemented.");
+}

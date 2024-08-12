@@ -15,11 +15,12 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  Alert,
 } from "@mui/material";
 import { Drone } from "../types";
-import { CreateDrone, DeleteDrone, fetchDrones, UpdateDrone } from "@/app/api";
 import Loading from "@/app/components/Loading";
 import { LoadingButton } from "@mui/lab";
+import { useApi } from "../../api";
 
 const Drones: React.FC = () => {
   const [drones, setDrones] = useState<Drone[]>([]);
@@ -31,7 +32,9 @@ const Drones: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("Fetching drones...");
   const [sendLoading, setSendLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const { CreateDrone, DeleteDrone, fetchDrones, UpdateDrone } = useApi();
   useEffect(() => {
     const fetchDrone = async () => {
       try {
@@ -86,6 +89,7 @@ const Drones: React.FC = () => {
 
     try {
       setSendLoading(true);
+      setErrorMessage(null);
       if (editMode && currentDroneId !== null) {
         setMessage("Saving Drone...");
         const updatedDrone = await UpdateDrone(newDrone, currentDroneId);
@@ -94,32 +98,34 @@ const Drones: React.FC = () => {
             drone.ID === currentDroneId ? updatedDrone : drone
           )
         );
-        // const droneData = await fetchDrones();
-        // setDrones(droneData);
       } else {
         setMessage("Creating Drone...");
         const createdDrone = await CreateDrone(newDrone);
         setDrones([...drones, createdDrone]);
-        // const droneData = await fetchDrones();
-        // setDrones(droneData);
       }
       handleClose();
     } catch (error) {
       console.error("Error adding drones:", error);
+      if (error instanceof Error) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage("An unexpected error occurred");
+      }
     } finally {
       setSendLoading(false);
     }
   };
-
-  // if (loading) {
-  //   return <Loading message={message} />;
-  // }
 
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
         Manage Drones
       </Typography>
+      {errorMessage && (
+        <Alert severity="error" onClose={() => setErrorMessage(null)}>
+          {errorMessage}
+        </Alert>
+      )}
       <Box display="flex" justifyContent="space-between" mb={2}>
         <Button variant="contained" color="primary" onClick={handleClickOpen}>
           Add Drone
@@ -129,26 +135,26 @@ const Drones: React.FC = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell className="text-center">ID</TableCell>
-              <TableCell className="text-center">Model</TableCell>
-              <TableCell className="text-center">Zone</TableCell>
-              <TableCell className="text-center">Actions</TableCell>
+              <TableCell className="!text-center">ID</TableCell>
+              <TableCell className="!text-center">Model</TableCell>
+              <TableCell className="!text-center">Zone</TableCell>
+              <TableCell className="!text-center">Actions</TableCell>
             </TableRow>
           </TableHead>
-          <TableBody className="text-center">
+          <TableBody className="!text-center">
             {drones.map((drone) => (
               <TableRow key={drone.ID}>
-                <TableCell className="text-center">{drone.ID}</TableCell>
-                <TableCell className="text-center">
+                <TableCell className="!text-center">{drone.ID}</TableCell>
+                <TableCell className="!text-center">
                   {drone.model_type}
                 </TableCell>
-                <TableCell className="text-center">{drone.zone}</TableCell>
-                <TableCell className="text-center">
+                <TableCell className="!text-center">{drone.zone}</TableCell>
+                <TableCell className="!text-center">
                   <Button
                     variant="contained"
                     color="primary"
                     onClick={() => handleEdit(drone)}
-                    className="mr-2"
+                    className="!mr-2"
                   >
                     Edit
                   </Button>

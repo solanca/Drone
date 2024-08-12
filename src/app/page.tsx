@@ -1,3 +1,4 @@
+// src/app/page.tsx (or wherever your Home component is defined)
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -8,43 +9,39 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Button,
   Typography,
   Paper,
   Link,
-  IconButton,
 } from "@mui/material";
 import { SelectChangeEvent } from "@mui/material/Select";
-import {
-  AccessRequest,
-  AccessResponse,
-  fetchAttributesByName,
-  fetchDronesByZone,
-  sendAccessRequest,
-} from "./api";
+import { useLayer } from "./context/LayerContext";
+import { AccessRequest, AccessResponse } from "./api";
 import { Drone } from "./admin/types";
-import Loading from "./components/Loading";
 import LoadingButton from "@mui/lab/LoadingButton";
+import Loading from "./components/Loading";
+import { useApi } from "./api";
 
 export default function Home() {
-  const [layer, setLayer] = useState("1");
-  const [zone, setZone] = React.useState<number>(NaN);
-  const [drones, setDrones] = React.useState<Drone[]>([]);
-  const [smallDrone, setSmallDrone] = React.useState<Drone | null>(null);
-  const [terminalDrone, setTerminalDrone] = React.useState<Drone | null>(null);
-  const [zones, setZones] = React.useState<string[]>([]);
+  const { layer, setLayer } = useLayer(); // Use the context
+  const [zone, setZone] = useState<number>(NaN);
+  const [drones, setDrones] = useState<Drone[]>([]);
+  const [smallDrone, setSmallDrone] = useState<Drone | null>(null);
+  const [terminalDrone, setTerminalDrone] = useState<Drone | null>(null);
+  const [zones, setZones] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [sendLoading, setSendLoading] = useState<boolean>(false);
+  const [accessResponse, setAccessResponse] = useState<AccessResponse | null>(
+    null
+  );
 
-  const [accessResponse, setAccessResponse] =
-    React.useState<AccessResponse | null>(null);
-
+  const { fetchAttributesByName, fetchDronesByZone, sendAccessRequest } =
+    useApi();
   useEffect(() => {
     const storedLayer = localStorage.getItem("layer");
     if (storedLayer) {
       setLayer(storedLayer);
     }
-  }, [layer]);
+  }, [setLayer]);
 
   useEffect(() => {
     const fetchZones = async () => {
@@ -97,7 +94,6 @@ export default function Home() {
     setSmallDrone(
       drones.find((drone: Drone) => drone.ID === event.target.value) || null
     );
-    console.log(smallDrone);
   };
 
   const handleTerminalDroneChange = (event: SelectChangeEvent<any>) => {
@@ -152,7 +148,7 @@ export default function Home() {
         >
           <FormControl
             variant="outlined"
-            className="w-full max-w-28 relative mr-40"
+            className="w-full max-w-28 relative !mr-40"
           >
             <InputLabel id="layer-label">Layer</InputLabel>
             <Select
@@ -189,7 +185,7 @@ export default function Home() {
         </Box>
         <Box display="flex" justifyContent="space-between" maxWidth={"lg"}>
           <Box>
-            <FormControl variant="outlined" className="min-w-52 mb-10">
+            <FormControl variant="outlined" className="!min-w-52 !mb-10">
               <InputLabel id="drone-label">Select Small Drone</InputLabel>
               <Select
                 labelId="drone-label"
@@ -227,13 +223,6 @@ export default function Home() {
           </Box>
           <div className="my-auto mx-auto flex flex-col items-center">
             <div>
-              {/* <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSendRequest}
-              >
-                Send Request
-              </Button> */}
               <LoadingButton
                 loading={sendLoading}
                 loadingPosition="end"
@@ -246,7 +235,7 @@ export default function Home() {
             </div>
           </div>
           <Box>
-            <FormControl variant="outlined" className="min-w-52 mb-10">
+            <FormControl variant="outlined" className="!min-w-52 !mb-10">
               <InputLabel id="drone-label">Select Terminal Drone</InputLabel>
               <Select
                 labelId="drone-label"

@@ -17,14 +17,9 @@ import {
   TextField,
 } from "@mui/material";
 import { Attribute } from "../types";
-import {
-  CreateAttribute,
-  DeleteAttribute,
-  fetchAttributes,
-  UpdateAttribute,
-} from "@/app/api";
 import Loading from "@/app/components/Loading";
 import { LoadingButton } from "@mui/lab";
+import { useApi } from "../../api";
 
 const Attributes: React.FC = () => {
   const [attributes, setAttributes] = useState<Attribute[]>([]);
@@ -40,6 +35,8 @@ const Attributes: React.FC = () => {
   const [message, setMessage] = useState("Fetching attributes...");
   const [sendLoading, setSendLoading] = useState<boolean>(false);
 
+  const { CreateAttribute, DeleteAttribute, fetchAttributes, UpdateAttribute } =
+    useApi();
   useEffect(() => {
     const fetchAttribute = async () => {
       try {
@@ -116,21 +113,21 @@ const Attributes: React.FC = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell className="text-center">Name</TableCell>
-              <TableCell className="text-center">Value</TableCell>
-              <TableCell className="text-center">Actions</TableCell>
+              <TableCell className="!text-center">Name</TableCell>
+              <TableCell className="!text-center">Value</TableCell>
+              <TableCell className="!text-center">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {attributes.map((attribute) => (
               <TableRow key={attribute.ID}>
-                <TableCell className="text-center">{attribute.name}</TableCell>
-                <TableCell className="text-center">
+                <TableCell className="!text-center">{attribute.name}</TableCell>
+                <TableCell className="!text-center">
                   {Array.isArray(attribute.value)
                     ? attribute.value.join(", ")
                     : ""}
                 </TableCell>
-                <TableCell className="text-center">
+                <TableCell className="!text-center">
                   <Button
                     variant="contained"
                     color="primary"

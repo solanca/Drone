@@ -17,14 +17,9 @@ import {
   TextField,
 } from "@mui/material";
 import { Policy } from "../types";
-import {
-  CreatePolicy,
-  DeletePolicy,
-  fetchPolicies,
-  UpdatePolicy,
-} from "@/app/api";
 import Loading from "@/app/components/Loading";
 import { LoadingButton } from "@mui/lab";
+import { useApi } from "../../api";
 
 const Policies: React.FC = () => {
   const [policies, setPolicies] = useState<Policy[]>([]);
@@ -38,6 +33,7 @@ const Policies: React.FC = () => {
   const [message, setMessage] = useState("Fetching policies...");
   const [sendLoading, setSendLoading] = useState(false);
 
+  const { CreatePolicy, DeletePolicy, fetchPolicies, UpdatePolicy } = useApi();
   useEffect(() => {
     const fetchPolicy = async () => {
       setLoading(true);
@@ -132,26 +128,28 @@ const Policies: React.FC = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell className="text-center">Zone</TableCell>
-              <TableCell className="text-center">StartTime</TableCell>
-              <TableCell className="text-center">EndTime</TableCell>
-              <TableCell className="text-center">Actions</TableCell>
+              <TableCell className="!text-center">Zone</TableCell>
+              <TableCell className="!text-center">StartTime</TableCell>
+              <TableCell className="!text-center">EndTime</TableCell>
+              <TableCell className="!text-center">Actions</TableCell>
             </TableRow>
           </TableHead>
-          <TableBody className="text-center">
+          <TableBody className="!text-center">
             {policies.map((policy) => (
               <TableRow key={policy.ID}>
-                <TableCell className="text-center">{policy.zone}</TableCell>
-                <TableCell className="text-center">
+                <TableCell className="!text-center">{policy.zone}</TableCell>
+                <TableCell className="!text-center">
                   {policy.start_time}
                 </TableCell>
-                <TableCell className="text-center">{policy.end_time}</TableCell>
-                <TableCell className="text-center">
+                <TableCell className="!text-center">
+                  {policy.end_time}
+                </TableCell>
+                <TableCell className="!text-center">
                   <Button
                     variant="contained"
                     color="primary"
                     onClick={() => handleEdit(policy)}
-                    className="mr-2"
+                    className="!mr-2"
                   >
                     Edit
                   </Button>

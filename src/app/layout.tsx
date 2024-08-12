@@ -1,17 +1,8 @@
+// src/app/layout.tsx
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  CssBaseline,
-  Container,
-} from "@mui/material";
-import Image from "next/image";
+import ClientProvider from "./components/ClientProvider";
+import ClientLayout from "./components/ClientLayout";
 import "./globals.css";
-import Link from "next/link";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Drone Access Manager",
@@ -29,25 +20,10 @@ export default function RootLayout({
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
-      <body className={inter.className}>
-        <CssBaseline />
-        <AppBar position="static">
-          <Toolbar>
-            <Link href="/" passHref>
-              <Image src="/logo.svg" alt="Logo" width={40} height={40} />
-            </Link>
-            <Typography
-              variant="h6"
-              component="div"
-              sx={{ flexGrow: 1, marginLeft: 2 }}
-            >
-              Drone Access Manager
-            </Typography>
-          </Toolbar>
-        </AppBar>
-        <Container>
-          <main>{children}</main>
-        </Container>
+      <body>
+        <ClientProvider>
+          <ClientLayout>{children}</ClientLayout>
+        </ClientProvider>
       </body>
     </html>
   );
