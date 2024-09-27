@@ -16,7 +16,7 @@ export const useApi = () => {
   const fetchDronesByZone = async (zone: number) => {
     const layer = localStorage.getItem("layer");
     var endpoint;
-    if (layer === "4") {
+    if (layer === "3") {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
     } else {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";
@@ -31,7 +31,7 @@ export const useApi = () => {
   const fetchAttributesByName = async (name: string) => {
     const layer = localStorage.getItem("layer");
     var endpoint;
-    if (layer === "4") {
+    if (layer === "3") {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
     } else {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";
@@ -46,11 +46,11 @@ export const useApi = () => {
   const sendAccessRequest = async (request: AccessRequest) => {
     const layer = localStorage.getItem("layer");
     var endpoint;
-    if (layer === "1") {
+    if (layer === "0") {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/layer-1";
-    } else if (layer === "2") {
+    } else if (layer === "1") {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/layer-2";
-    } else if (layer === "3") {
+    } else if (layer === "2") {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/layer-3";
     } else {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/layer-4";
@@ -73,7 +73,7 @@ export const useApi = () => {
   const fetchDrones = async () => {
     const layer = localStorage.getItem("layer");
     var endpoint;
-    if (layer === "4") {
+    if (layer === "3") {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
     } else {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";
@@ -88,7 +88,7 @@ export const useApi = () => {
   const fetchPolicies = async () => {
     const layer = localStorage.getItem("layer");
     var endpoint;
-    if (layer === "4" || layer === "3") {
+    if (layer === "3" || layer === "2") {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
     } else {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";
@@ -103,7 +103,7 @@ export const useApi = () => {
   const fetchAttributes = async () => {
     const layer = localStorage.getItem("layer");
     var endpoint;
-    if (layer === "4") {
+    if (layer === "3") {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
     } else {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";
@@ -137,7 +137,7 @@ export const useApi = () => {
   const UpdateAttribute = async (newAttribute: Attribute, id: string) => {
     const layer = localStorage.getItem("layer");
     var endpoint;
-    if (layer === "4") {
+    if (layer === "3") {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
     } else {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";
@@ -171,7 +171,7 @@ export const useApi = () => {
   const CreateDrone = async (newDrone: Drone) => {
     const layer = localStorage.getItem("layer");
     var endpoint;
-    if (layer === "4") {
+    if (layer === "3") {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
     } else {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";
@@ -196,7 +196,7 @@ export const useApi = () => {
   const UpdateDrone = async (newDrone: Drone, id: string) => {
     const layer = localStorage.getItem("layer");
     var endpoint;
-    if (layer === "4") {
+    if (layer === "3") {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
     } else {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";
@@ -218,7 +218,7 @@ export const useApi = () => {
   const DeleteDrone = async (droneId: string | null) => {
     const layer = localStorage.getItem("layer");
     var endpoint;
-    if (layer === "4") {
+    if (layer === "3") {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
     } else {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";
@@ -234,7 +234,7 @@ export const useApi = () => {
   const CreatePolicy = async (newPolicy: Policy) => {
     const layer = localStorage.getItem("layer");
     var endpoint;
-    if (layer === "4" || layer == "3") {
+    if (layer === "3" || layer == "2") {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
     } else {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";
@@ -257,7 +257,7 @@ export const useApi = () => {
   const UpdatePolicy = async (newPolicy: Policy, id: string) => {
     const layer = localStorage.getItem("layer");
     var endpoint;
-    if (layer === "4" || layer == "3") {
+    if (layer === "3" || layer == "2") {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
     } else {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";
@@ -279,7 +279,7 @@ export const useApi = () => {
   const DeletePolicy = async (policyId: string | null) => {
     const layer = localStorage.getItem("layer");
     var endpoint;
-    if (layer === "4" || layer == "3") {
+    if (layer === "3" || layer == "2") {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/on-chain";
     } else {
       endpoint = process.env.NEXT_PUBLIC_API_URL + "/off-chain";

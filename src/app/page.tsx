@@ -1,4 +1,3 @@
-// src/app/page.tsx (or wherever your Home component is defined)
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -22,11 +21,11 @@ import Loading from "./components/Loading";
 import { useApi } from "./api";
 
 export default function Home() {
-  const { layer, setLayer } = useLayer(); // Use the context
+  const { layer, setLayer } = useLayer();
   const [zone, setZone] = useState<number>(NaN);
   const [drones, setDrones] = useState<Drone[]>([]);
-  const [smallDrone, setSmallDrone] = useState<Drone | null>(null);
   const [terminalDrone, setTerminalDrone] = useState<Drone | null>(null);
+  const [edgeDrone, setEdgeDrone] = useState<Drone | null>(null);
   const [zones, setZones] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [sendLoading, setSendLoading] = useState<boolean>(false);
@@ -76,24 +75,18 @@ export default function Home() {
       const drones = await fetchDronesByZone(Number(selectedZone));
       setDrones(drones === null ? [] : drones);
 
-      const firstSmallDrone =
-        drones.find((drone: Drone) => drone.model_type === "Small") || null;
       const firstTerminalDrone =
         drones.find((drone: Drone) => drone.model_type === "Terminal") || null;
+      const firstEdgeDrone =
+        drones.find((drone: Drone) => drone.model_type === "Edge") || null;
 
-      setSmallDrone(firstSmallDrone);
       setTerminalDrone(firstTerminalDrone);
+      setEdgeDrone(firstEdgeDrone);
     } catch (error) {
       console.error("Error fetching drones:", error);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleSmallDroneChange = (event: SelectChangeEvent<any>) => {
-    setSmallDrone(
-      drones.find((drone: Drone) => drone.ID === event.target.value) || null
-    );
   };
 
   const handleTerminalDroneChange = (event: SelectChangeEvent<any>) => {
@@ -102,14 +95,21 @@ export default function Home() {
     );
   };
 
+  const handleEdgeDroneChange = (event: SelectChangeEvent<any>) => {
+    setEdgeDrone(
+      drones.find((drone: Drone) => drone.ID === event.target.value) || null
+    );
+  };
+
   const handleSendRequest = async () => {
-    if (!smallDrone) {
-      console.error("No small drone selected");
+    if (!terminalDrone) {
+      console.error("No terminal drone selected");
       return;
     }
 
     const request: AccessRequest = {
-      entity_id: smallDrone.ID !== undefined ? smallDrone.ID.toString() : "",
+      entity_id:
+        terminalDrone.ID !== undefined ? terminalDrone.ID.toString() : "",
       request_target: zone,
     };
 
@@ -124,10 +124,6 @@ export default function Home() {
     }
   };
 
-  // if (loading) {
-  //   return <Loading message={message} />;
-  // }
-
   return (
     <Container maxWidth={"lg"} className="relative">
       <Box
@@ -139,28 +135,22 @@ export default function Home() {
         p={5}
         maxWidth={"lg"}
       >
-        <Box
-          mb={8}
-          display="flex"
-          flexDirection="row"
-          alignItems={"center"}
-          // justifyContent={"space-between"}
-        >
+        <Box mb={8} display="flex" flexDirection="row" alignItems={"center"}>
           <FormControl
             variant="outlined"
             className="w-full max-w-28 relative !mr-40"
           >
-            <InputLabel id="layer-label">Layer</InputLabel>
+            <InputLabel id="layer-label">Level</InputLabel>
             <Select
               labelId="layer-label"
               value={layer}
               onChange={handleLayerChange}
-              label="Layer"
+              label="Level"
             >
-              <MenuItem value={1}>Layer 1</MenuItem>
-              <MenuItem value={2}>Layer 2</MenuItem>
-              <MenuItem value={3}>Layer 3</MenuItem>
-              <MenuItem value={4}>Layer 4</MenuItem>
+              <MenuItem value={0}>Level 0</MenuItem>
+              <MenuItem value={1}>Level 1</MenuItem>
+              <MenuItem value={2}>Level 2</MenuItem>
+              <MenuItem value={3}>Level 3</MenuItem>
             </Select>
           </FormControl>
           <FormControl variant="outlined" className="w-full max-w-28">
@@ -184,56 +174,6 @@ export default function Home() {
           </div>
         </Box>
         <Box display="flex" justifyContent="space-between" maxWidth={"lg"}>
-          <Box>
-            <FormControl variant="outlined" className="!min-w-52 !mb-10">
-              <InputLabel id="drone-label">Select Small Drone</InputLabel>
-              <Select
-                labelId="drone-label"
-                value={smallDrone?.ID}
-                onChange={handleSmallDroneChange}
-                label="Select Small Drone"
-              >
-                {drones.map((drone: Drone, index) =>
-                  drone.model_type === "Small" ? (
-                    <MenuItem value={drone.ID} key={index}>
-                      {drone.ID}
-                    </MenuItem>
-                  ) : null
-                )}
-              </Select>
-            </FormControl>
-            <Typography variant="h5" align="center" mb={2}>
-              Small Drone
-            </Typography>
-            <Paper
-              variant="outlined"
-              className="w-[400px] h-[500px] p-8 flex flex-col"
-            >
-              <Typography variant="h6">Attributes</Typography>
-              {smallDrone ? (
-                <>
-                  <Typography>ID: {smallDrone.ID}</Typography>
-                  <Typography>Type: {smallDrone.model_type}</Typography>
-                  <Typography>Zone: {smallDrone.zone}</Typography>
-                </>
-              ) : (
-                <Typography>No small drone selected</Typography>
-              )}
-            </Paper>
-          </Box>
-          <div className="my-auto mx-auto flex flex-col items-center">
-            <div>
-              <LoadingButton
-                loading={sendLoading}
-                loadingPosition="end"
-                variant="contained"
-                sx={{ width: "190px" }}
-                onClick={handleSendRequest}
-              >
-                Send Request
-              </LoadingButton>
-            </div>
-          </div>
           <Box>
             <FormControl variant="outlined" className="!min-w-52 !mb-10">
               <InputLabel id="drone-label">Select Terminal Drone</InputLabel>
@@ -267,7 +207,57 @@ export default function Home() {
                   <Typography>Zone: {terminalDrone.zone}</Typography>
                 </>
               ) : (
-                <Typography>No Terminal drone selected</Typography>
+                <Typography>No terminal drone selected</Typography>
+              )}
+            </Paper>
+          </Box>
+          <div className="my-auto mx-auto flex flex-col items-center">
+            <div>
+              <LoadingButton
+                loading={sendLoading}
+                loadingPosition="end"
+                variant="contained"
+                sx={{ width: "190px" }}
+                onClick={handleSendRequest}
+              >
+                Send Request
+              </LoadingButton>
+            </div>
+          </div>
+          <Box>
+            <FormControl variant="outlined" className="!min-w-52 !mb-10">
+              <InputLabel id="drone-label">Select Edge Drone</InputLabel>
+              <Select
+                labelId="drone-label"
+                value={edgeDrone?.ID}
+                onChange={handleEdgeDroneChange}
+                label="Select Edge Drone"
+              >
+                {drones.map((drone: Drone, index) =>
+                  drone.model_type === "Edge" ? (
+                    <MenuItem value={drone.ID} key={index}>
+                      {drone.ID}
+                    </MenuItem>
+                  ) : null
+                )}
+              </Select>
+            </FormControl>
+            <Typography variant="h5" align="center" mb={2}>
+              Edge Drone
+            </Typography>
+            <Paper
+              variant="outlined"
+              className="w-[400px] h-[500px] p-8 flex flex-col"
+            >
+              <Typography variant="h6">Attributes</Typography>
+              {edgeDrone ? (
+                <>
+                  <Typography>ID: {edgeDrone.ID}</Typography>
+                  <Typography>Type: {edgeDrone.model_type}</Typography>
+                  <Typography>Zone: {edgeDrone.zone}</Typography>
+                </>
+              ) : (
+                <Typography>No Edge drone selected</Typography>
               )}
               {accessResponse ? (
                 <Typography

@@ -120,7 +120,7 @@ const Policies: React.FC = () => {
       </Typography>
       <Box display="flex" justifyContent="space-between" mb={2}>
         <Button variant="contained" color="primary" onClick={handleClickOpen}>
-          Add Drone
+          Add Policy
         </Button>
       </Box>
 
