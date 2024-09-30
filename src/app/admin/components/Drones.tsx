@@ -175,9 +175,7 @@ const Drones: React.FC = () => {
       </TableContainer>
 
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>
-          {editMode ? "Edit Attribute" : "Add New Attribute"}
-        </DialogTitle>
+        <DialogTitle>{editMode ? "Edit Drone" : "Add New Drone"}</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
