@@ -137,7 +137,6 @@ const Drones: React.FC = () => {
             <TableRow>
               <TableCell className="!text-center">ID</TableCell>
               <TableCell className="!text-center">Model</TableCell>
-              <TableCell className="!text-center">Zone</TableCell>
               <TableCell className="!text-center">Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -148,7 +147,6 @@ const Drones: React.FC = () => {
                 <TableCell className="!text-center">
                   {drone.model_type}
                 </TableCell>
-                <TableCell className="!text-center">{drone.zone}</TableCell>
                 <TableCell className="!text-center">
                   <Button
                     variant="contained"

@@ -42,7 +42,11 @@ export default function ClientLayout({
             Drone Access Control
           </Typography>
           <Typography variant="h6" component="div" sx={{ marginRight: 2 }}>
-            {layer === "" ? "" : `Level ${layer}`}
+            {layer === ""
+              ? ""
+              : layer === "3"
+              ? `Level ${layer}+`
+              : `Level ${layer}`}
           </Typography>
         </Toolbar>
       </AppBar>

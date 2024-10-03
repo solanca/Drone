@@ -150,7 +150,7 @@ export default function Home() {
               <MenuItem value={0}>Level 0</MenuItem>
               <MenuItem value={1}>Level 1</MenuItem>
               <MenuItem value={2}>Level 2</MenuItem>
-              <MenuItem value={3}>Level 3</MenuItem>
+              <MenuItem value={3}>Level 3+</MenuItem>
             </Select>
           </FormControl>
           <FormControl variant="outlined" className="w-full max-w-28">
